@@ -25,7 +25,7 @@ public class PlayerMovement : MonoBehaviour
         rb.MovePosition(rb.position + foce * Time.fixedDeltaTime);
         if (dx != 0 )
         {
-            if (dx < 0)
+            if (dx > 0)
             {
                 spriteRenderer.flipX = true;
             }
