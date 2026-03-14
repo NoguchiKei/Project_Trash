@@ -4,52 +4,49 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+    // プレイヤーの物理挙動を制御する Rigidbody
     private Rigidbody2D rb;
-    private float speed = 4f;
+
+    // プレイヤーのスプライト表示を管理
     private SpriteRenderer spriteRenderer;
+
+    // プレイヤーの移動速度
+    [SerializeField,Header("移動速度")]
+    private float speed;
+
+    // 入力された移動方向を保存
+    private Vector2 moveInput;
 
     void Start()
     {
+        // 同じオブジェクトについている Rigidbody2D を取得
         rb = GetComponent<Rigidbody2D>();
+
+        // 同じオブジェクトについている SpriteRenderer を取得
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        Vector2 foce = Vector2.zero;
-        float dy, dx = 0;
-        dx = Input.GetAxis("Horizontal");
-        dy = Input.GetAxis("Vertical");
-        foce = new Vector2(dx, dy) * speed;
-        rb.MovePosition(rb.position + foce * Time.fixedDeltaTime);
-        if (dx != 0 )
-        {
-            if (dx > 0)
-            {
-                spriteRenderer.flipX = true;
-            }
-            else 
-            {
-                spriteRenderer.flipX = false;
-            }
-        }
+        // キーボードの左右入力を取得（A,Dキー / ←→）
+        float dx = Input.GetAxis("Horizontal");
 
-        
+        // キーボードの上下入力を取得（W,Sキー / ↑↓）
+        float dy = Input.GetAxis("Vertical");
+
+        // 入力方向をベクトルとして保存（normalizedで斜め移動の速度を一定にする）
+        moveInput = new Vector2(dx, dy).normalized;
+
+        // 移動方向に応じてキャラクターの向きを変更
+        if (dx > 0)
+            spriteRenderer.flipX = true;   // 右向き
+        else if (dx < 0)
+            spriteRenderer.flipX = false;  // 左向き
     }
 
-    //private void OnTriggerEnter2D(Collider2D collision)
-    //{
-    //    if(collision.tag=="Enemy")
-    //    {
-    //        Debug.Log("Player hit enemy");
-    //    }
-    //}
-
-    //private void OnTriggerEnter2D(Collider2D collision)
-    //{
-    //    GetComponent<Renderer>().material.color = Color.red;
-    //}
-
-
+    void FixedUpdate()
+    {
+        // Rigidbody を使ってプレイヤーを移動させる（物理更新タイミング）
+        rb.MovePosition(rb.position + moveInput * speed * Time.fixedDeltaTime);
+    }
 }
